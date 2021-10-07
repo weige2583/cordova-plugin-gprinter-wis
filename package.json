@@ -1,0 +1,21 @@
+{
+  "name": "com.isesol.wis",
+  "version": "0.0.1",
+  "description": "A Cordova Plugin of Gprinter Bluetooth from WIS",
+  "cordova": {
+    "id": "com.isesol.wis",
+    "platforms": [
+      "android"
+    ]
+  },
+  "keywords": [
+    "Android",
+    "Gprinter",
+    "Bluetooth",
+    "Cordova",
+    "ecosystem:cordova",
+    "cordova-android"
+  ],
+  "author": "Greg.Xie",
+  "license": "Apache 2.0 License"
+}
