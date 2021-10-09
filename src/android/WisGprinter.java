@@ -21,7 +21,6 @@ import java.util.UUID;
 import java.io.IOException;
 import java.io.OutputStream;
 
-
 import com.gprinter.command.CpclCommand;
 import com.gprinter.command.EscCommand;
 import com.gprinter.command.LabelCommand;
@@ -51,7 +50,7 @@ public class WisGprinter extends CordovaPlugin {
     private static final String LOG_TAG = "WisGprinter";
 
     private int id = 0;
-    private String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};
+    private String[] permissions = { Manifest.permission.ACCESS_FINE_LOCATION };
     private CallbackContext mcallbackContext;
     private JSONArray requestArgs;
     // private PrinterServiceConnection conn = null;
@@ -117,7 +116,8 @@ public class WisGprinter extends CordovaPlugin {
                     result = false;
                 }
                 break;
-            case "addOffset": // 该指令用于控制在剥离模式时（peel-off mode）每张卷标停止的位置，在打印下一张时打印机会将原先多推出或少推出的部分以回拉方式补偿回来。该指令仅适用于剥离模式。
+            case "addOffset": // 该指令用于控制在剥离模式时（peel-off
+                              // mode）每张卷标停止的位置，在打印下一张时打印机会将原先多推出或少推出的部分以回拉方式补偿回来。该指令仅适用于剥离模式。
                 tsc = getTsc(1);
                 if (tsc != null) {
                     tsc.addOffset(args.getInt(0));
@@ -144,7 +144,8 @@ public class WisGprinter extends CordovaPlugin {
             case "addDirection": // 该指令用于定义打印时出纸和打印字体的方向, 0(横向)和1(纵向)
                 tsc = getTsc(2);
                 if (tsc != null) {
-                    tsc.addDirection(LabelCommand.DIRECTION.values()[args.getInt(0)], LabelCommand.MIRROR.values()[args.getInt(1)]);
+                    tsc.addDirection(LabelCommand.DIRECTION.values()[args.getInt(0)],
+                            LabelCommand.MIRROR.values()[args.getInt(1)]);
                 } else {
                     result = false;
                 }
@@ -207,10 +208,8 @@ public class WisGprinter extends CordovaPlugin {
                 break;
             case "addHome":
                 /**
-                 * 在使用含有间隙或黑标的标签纸时，若不能确定第一张标签纸是否在正确打印位
-                 * 置时，此指令可将标签纸向前推送至下一张标签纸的起点开始打印。标签尺寸和
-                 * 间隙需要在本条指令前设置
-                 * 注：使用该指令时，纸张高度大于或等于30 mm
+                 * 在使用含有间隙或黑标的标签纸时，若不能确定第一张标签纸是否在正确打印位 置时，此指令可将标签纸向前推送至下一张标签纸的起点开始打印。标签尺寸和
+                 * 间隙需要在本条指令前设置 注：使用该指令时，纸张高度大于或等于30 mm
                  */
                 tsc = getTsc(0);
                 if (tsc != null) {
@@ -229,9 +228,7 @@ public class WisGprinter extends CordovaPlugin {
                 break;
             case "addPrint":
                 /**
-                 * 该指令用于打印出存储于影像缓冲区内的数据
-                 * 传入参数说明  打印份数
-                 * 1≤n≤65535
+                 * 该指令用于打印出存储于影像缓冲区内的数据 传入参数说明 打印份数 1≤n≤65535
                  */
                 tsc = getTsc(2);
                 if (tsc != null) {
@@ -242,10 +239,8 @@ public class WisGprinter extends CordovaPlugin {
                 break;
             case "addSound":
                 /**
-                 * 该指令用于控制蜂鸣器的频率，可设定10 阶的声音，每阶声音的长短由第二个参数控制
-                 * 传入参数说明
-                 * level        音阶:0-9
-                 * interval 间隔时间:1-4095
+                 * 该指令用于控制蜂鸣器的频率，可设定10 阶的声音，每阶声音的长短由第二个参数控制 传入参数说明 level 音阶:0-9 interval
+                 * 间隔时间:1-4095
                  */
                 tsc = getTsc(2);
                 if (tsc != null) {
@@ -256,8 +251,7 @@ public class WisGprinter extends CordovaPlugin {
                 break;
             case "addLimitfeed":
                 /**
-                 * 该指令用于设定打印机进纸时，若经过所设定的长度仍无法侦测到垂直间距，则打印机在连续纸模式工作
-                 * 传入参数说明  点数dots
+                 * 该指令用于设定打印机进纸时，若经过所设定的长度仍无法侦测到垂直间距，则打印机在连续纸模式工作 传入参数说明 点数dots
                  */
                 tsc = getTsc(1);
                 if (tsc != null) {
@@ -276,11 +270,7 @@ public class WisGprinter extends CordovaPlugin {
                 break;
             case "addBar":
                 /**
-                 * 该指令用于在标签上画线
-                 * 传入参数说明
-                 * x 线条左上角X 坐标，单位dots
-                 * y 线条左上角Y 坐标，单位dots
-                 * width  线宽，单位dots
+                 * 该指令用于在标签上画线 传入参数说明 x 线条左上角X 坐标，单位dots y 线条左上角Y 坐标，单位dots width 线宽，单位dots
                  * height 线高，单位dots
                  */
                 tsc = getTsc(4);
@@ -292,11 +282,7 @@ public class WisGprinter extends CordovaPlugin {
                 break;
             case "addBox":
                 /**
-                 * 该指令用于在标签上画线
-                 * 传入参数说明
-                 * x 线条左上角X 坐标，单位dots
-                 * y 线条左上角Y 坐标，单位dots
-                 * width  线宽，单位dots
+                 * 该指令用于在标签上画线 传入参数说明 x 线条左上角X 坐标，单位dots y 线条左上角Y 坐标，单位dots width 线宽，单位dots
                  * height 线高，单位dots
                  */
                 tsc = getTsc(5);
@@ -308,45 +294,34 @@ public class WisGprinter extends CordovaPlugin {
                 break;
             case "addBarCode":
                 /**
-                 * 该指令用来画一维条码
-                 * 传入参数说明
-                 * x 左上角水平坐标起点，以点（dot）表示
-                 * y 左上角垂直坐标起点，以点（dot）表示
-                 * codetype 条形码类型
-                 * height 条形码高度，以点（dot）表示
-                 * readable 0 表示人眼不可识，1 表示人眼可识
-                 * rotation 条形码旋转角度，顺时针方向 0,90,180,270
-                 * narrow 窄bar 宽度，以点（dots）表示
-                 * wide 宽bar 宽度，以点（dot）表示
-                 * content 打印内容
+                 * 该指令用来画一维条码 传入参数说明 x 左上角水平坐标起点，以点（dot）表示 y 左上角垂直坐标起点，以点（dot）表示 codetype 条形码类型
+                 * height 条形码高度，以点（dot）表示 readable 0 表示人眼不可识，1 表示人眼可识 rotation 条形码旋转角度，顺时针方向
+                 * 0,90,180,270 narrow 窄bar 宽度，以点（dots）表示 wide 宽bar 宽度，以点（dot）表示 content 打印内容
                  */
                 tsc = getTsc(9);
                 if (tsc != null) {
-                    tsc.add1DBarcode(args.getInt(0), args.getInt(1), LabelCommand.BARCODETYPE.valueOf(args.getString(2)), args.getInt(3), LabelCommand.READABEL.values()[args.getInt(4)], LabelCommand.ROTATION.valueOf("ROTATION_"+ args.getInt(5)), args.getInt(6), args.getInt(7), args.getString(8));
+                    tsc.add1DBarcode(args.getInt(0), args.getInt(1),
+                            LabelCommand.BARCODETYPE.valueOf(args.getString(2)), args.getInt(3),
+                            LabelCommand.READABEL.values()[args.getInt(4)],
+                            LabelCommand.ROTATION.valueOf("ROTATION_" + args.getInt(5)), args.getInt(6), args.getInt(7),
+                            args.getString(8));
                 } else {
                     result = false;
                 }
                 break;
-            /*case "addBitmap": // TODO
-                *//**
-                 * 打印图片（单色图片）
-                 * res为画布参数
-                 *//*
-                tsc = getTsc(4);
-                if (tsc != null) {
-                    tsc.addBitmap(args.getInt(0), args.getInt(1), LabelCommand.BITMAP_MODE.valueOf(args.getString(2)), args.getInt(3));
-                } else {
-                    result = false;
-                }
-                break;*/
+            /*
+             * case "addBitmap": // TODO
+             *//**
+                * 打印图片（单色图片） res为画布参数
+                *//*
+                   * tsc = getTsc(4); if (tsc != null) { tsc.addBitmap(args.getInt(0),
+                   * args.getInt(1), LabelCommand.BITMAP_MODE.valueOf(args.getString(2)),
+                   * args.getInt(3)); } else { result = false; } break;
+                   */
             case "addErase":
                 /**
-                 * 将指定的区域反相打印
-                 * 传入参数说明
-                 * x_start 反相区域左上角X 坐标，单位dot
-                 * y_start 反相区域左上角Y 坐标，单位dot
-                 * x_width 反相区域宽度，单位dot
-                 * y_height 反相区域高度，单位dot
+                 * 将指定的区域反相打印 传入参数说明 x_start 反相区域左上角X 坐标，单位dot y_start 反相区域左上角Y 坐标，单位dot x_width
+                 * 反相区域宽度，单位dot y_height 反相区域高度，单位dot
                  */
                 tsc = getTsc(4);
                 if (tsc != null) {
@@ -357,12 +332,8 @@ public class WisGprinter extends CordovaPlugin {
                 break;
             case "addReverse":
                 /**
-                 * 将指定的区域反相打印
-                 * 传入参数说明
-                 * x_start 反相区域左上角X 坐标，单位dot
-                 * y_start 反相区域左上角Y 坐标，单位dot
-                 * x_width 反相区域宽度，单位dot
-                 * y_height 反相区域高度，单位dot
+                 * 将指定的区域反相打印 传入参数说明 x_start 反相区域左上角X 坐标，单位dot y_start 反相区域左上角Y 坐标，单位dot x_width
+                 * 反相区域宽度，单位dot y_height 反相区域高度，单位dot
                  */
                 tsc = getTsc(4);
                 if (tsc != null) {
@@ -373,63 +344,41 @@ public class WisGprinter extends CordovaPlugin {
                 break;
             case "addText":
                 /**
-                 * 该指令用于打印字符串
-                 * 传入参数说明
-                 *  x 文字X 方向起始点坐标
-                 *  y 文字Y 方向起始点坐标
-                 *  font 字体名称
-                 *  1 8×12 dot 英数字体
-                 *  2 12×20 dot 英数字体
-                 *  3 16×24 dot 英数字体
-                 *  4 24×32 dot 英数字体
-                 *  5 32×48 dot 英数字体
-                 *  6 14×19 dot 英数字体OCR-B
-                 *  7 21×27 dot 英数字体OCR-B
-                 *  8 14×25 dot 英数字体OCR-A
-                 *  9 9×17 dot 英数字体
-                 *  10 12×24 dot 英数字体
-                 *  TSS16.BF2 简体中文16×16（GB 码）
-                 *  TSS20.BF2 简体中文20×20（GB 码）
-                 *  TST24.BF2 繁体中文24×24（大五码）
-                 *  TSS24.BF2 简体中文24×24（GB 码）
-                 *  K 韩文24×24Font（KS 码）
-                 * TSS32.BF2 简体中文32×32（GB 码）
-                 * rotation 文字旋转角度（顺时针方向） 0， 90， 180， 270
+                 * 该指令用于打印字符串 传入参数说明 x 文字X 方向起始点坐标 y 文字Y 方向起始点坐标 font 字体名称 1 8×12 dot 英数字体 2
+                 * 12×20 dot 英数字体 3 16×24 dot 英数字体 4 24×32 dot 英数字体 5 32×48 dot 英数字体 6 14×19 dot
+                 * 英数字体OCR-B 7 21×27 dot 英数字体OCR-B 8 14×25 dot 英数字体OCR-A 9 9×17 dot 英数字体 10
+                 * 12×24 dot 英数字体 TSS16.BF2 简体中文16×16（GB 码） TSS20.BF2 简体中文20×20（GB 码） TST24.BF2
+                 * 繁体中文24×24（大五码） TSS24.BF2 简体中文24×24（GB 码） K 韩文24×24Font（KS 码） TSS32.BF2
+                 * 简体中文32×32（GB 码） rotation 文字旋转角度（顺时针方向） 0， 90， 180， 270
                  */
                 tsc = getTsc(7);
                 if (tsc != null) {
-                    tsc.addText(args.getInt(0), args.getInt(1), LabelCommand.FONTTYPE.valueOf(args.getString(2)), LabelCommand.ROTATION.valueOf("ROTATION_"+ args.getInt(3)), LabelCommand.FONTMUL.valueOf("MUL_" + args.getInt(4)), LabelCommand.FONTMUL.valueOf("MUL_" + args.getInt(5)), args.getString(6));
+                    tsc.addText(args.getInt(0), args.getInt(1), LabelCommand.FONTTYPE.valueOf(args.getString(2)),
+                            LabelCommand.ROTATION.valueOf("ROTATION_" + args.getInt(3)),
+                            LabelCommand.FONTMUL.valueOf("MUL_" + args.getInt(4)),
+                            LabelCommand.FONTMUL.valueOf("MUL_" + args.getInt(5)), args.getString(6));
                 } else {
                     result = false;
                 }
                 break;
             case "addQRCode":
                 /**
-                 * 该指令用来打印二维码
-                 * ｘ 二维码水平方向起始点坐标
-                 * ｙ 二维码垂直方向起始点坐标
-                 * ECC level 选择QRCODE 纠错等级
-                 *   L 7%
-                 *   M 15%
-                 *   Q 25%
-                 *   H 30%
-                 * cell width 二维码宽度1-10
-                 * rotation 旋转角度（顺时针方向） 0，90，180，270
-                 * content  内容
+                 * 该指令用来打印二维码 ｘ 二维码水平方向起始点坐标 ｙ 二维码垂直方向起始点坐标 ECC level 选择QRCODE 纠错等级 L 7% M 15% Q
+                 * 25% H 30% cell width 二维码宽度1-10 rotation 旋转角度（顺时针方向） 0，90，180，270 content 内容
                  */
                 tsc = getTsc(6);
                 if (tsc != null) {
-                    tsc.addQRCode(args.getInt(0), args.getInt(1), LabelCommand.EEC.valueOf("LEVEL_" + args.getString(2)), LabelCommand.ROTATION.valueOf("ROTATION_"+ args.getInt(3)), args.getInt(4), args.getString(5));
+                    tsc.addQRCode(args.getInt(0), args.getInt(1),
+                            LabelCommand.EEC.valueOf("LEVEL_" + args.getString(2)),
+                            LabelCommand.ROTATION.valueOf("ROTATION_" + args.getInt(3)), args.getInt(4),
+                            args.getString(5));
                 } else {
                     result = false;
                 }
                 break;
             case "addPeel":
                 /**
-                 * 该指令用来启动/关闭剥离模式，默认值为关闭
-                 * 传入参数说明
-                 * ON  起动剥离模式
-                 * OFF 关闭剥离模式
+                 * 该指令用来启动/关闭剥离模式，默认值为关闭 传入参数说明 ON 起动剥离模式 OFF 关闭剥离模式
                  */
                 tsc = getTsc(1);
                 if (tsc != null) {
@@ -440,10 +389,8 @@ public class WisGprinter extends CordovaPlugin {
                 break;
             case "addTear":
                 /**
-                 * 此命令是用来启用/禁用撕纸位置走到撕纸处，此设置关掉电源后将保存在打印机内
-                 * 传入参数说明
-                 * ON 启用撕纸位置走到撕纸处
-                 * OFF 禁用撕纸位置走到撕纸处，命令在起始位置有效
+                 * 此命令是用来启用/禁用撕纸位置走到撕纸处，此设置关掉电源后将保存在打印机内 传入参数说明 ON 启用撕纸位置走到撕纸处 OFF
+                 * 禁用撕纸位置走到撕纸处，命令在起始位置有效
                  */
                 tsc = getTsc(1);
                 if (tsc != null) {
@@ -454,10 +401,7 @@ public class WisGprinter extends CordovaPlugin {
                 break;
             case "addReprint":
                 /**
-                 * 此命令将禁用/启用标签机在无纸或开盖错误发生后，上纸或合盖后重新打印一次标签内容
-                 * 传入参数说明
-                 * OFF 禁止此功能
-                 * ON 启用此功能
+                 * 此命令将禁用/启用标签机在无纸或开盖错误发生后，上纸或合盖后重新打印一次标签内容 传入参数说明 OFF 禁止此功能 ON 启用此功能
                  */
                 tsc = getTsc(1);
                 if (tsc != null) {
@@ -468,15 +412,23 @@ public class WisGprinter extends CordovaPlugin {
                 break;
             case "addCut":
                 /**
-                 * 此命令用于设置切刀状态，关闭打印机电源后，该设置将会被存储在打印机内存中。
-                 * 传入参数说明
-                 * OFF 关闭切刀功能
-                 * BATCH 在PRINT 命令结束后切纸
+                 * 此命令用于设置切刀状态，关闭打印机电源后，该设置将会被存储在打印机内存中。 传入参数说明 OFF 关闭切刀功能 BATCH 在PRINT 命令结束后切纸
                  * pieces 0-65535，用于设置每几个标签进行切纸
                  */
                 tsc = getTsc(1);
                 if (tsc != null) {
                     tsc.addCutter(LabelCommand.ENABLE.values()[args.getInt(0)]);
+                } else {
+                    result = false;
+                }
+                break;
+            case "addCutterPieces":
+                /**
+                 * 在PRINT 命令结束后切纸 pieces 0-65535，用于设置每几个标签进行切纸
+                 */
+                tsc = getTsc(1);
+                if (tsc != null) {
+                    tsc.addCutterPieces(args.getInt(0));
                 } else {
                     result = false;
                 }
@@ -491,7 +443,6 @@ public class WisGprinter extends CordovaPlugin {
                 break;
             default:
                 result = false;
-
 
         }
 
@@ -556,7 +507,7 @@ public class WisGprinter extends CordovaPlugin {
         return datas;
     }
 
-    private void sendPrint (CallbackContext callbackContext) {
+    private void sendPrint(CallbackContext callbackContext) {
         if (isConnection) {
             try {
                 Vector<Byte> datas = getTsc(0).getCommand();
@@ -590,7 +541,8 @@ public class WisGprinter extends CordovaPlugin {
     }
 
     private void closePort() {
-        if (DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id] != null && DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].mPort != null) {
+        if (DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id] != null
+                && DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].mPort != null) {
             DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].closePort(id);
             isConnection = false;
         }
@@ -601,7 +553,8 @@ public class WisGprinter extends CordovaPlugin {
         if (!isConnection) {
             try {
                 closePort();
-                new DeviceConnFactoryManager.Build().setId(id).setMacAddress(macAddress).setConnMethod(DeviceConnFactoryManager.CONN_METHOD.BLUETOOTH).build();
+                new DeviceConnFactoryManager.Build().setId(id).setMacAddress(macAddress)
+                        .setConnMethod(DeviceConnFactoryManager.CONN_METHOD.BLUETOOTH).build();
                 DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].openPort();
                 isConnection = true;
                 PluginResult result = new PluginResult(PluginResult.Status.NO_RESULT);
@@ -640,8 +593,9 @@ public class WisGprinter extends CordovaPlugin {
      * @param callbackContext
      */
     private void createTsc(JSONArray args, CallbackContext callbackContext) {
+        int commandIndex = args.getInt(0);
         LabelCommand tsc = new LabelCommand();
-        DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].labels.put(id, tsc);
+        DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].labels.put(commandIndex, tsc);
         callbackContext.success("ok");
     }
 
@@ -702,7 +656,6 @@ public class WisGprinter extends CordovaPlugin {
     public void onRestoreStateForActivityResult(Bundle state, CallbackContext callbackContext) {
         this.mcallbackContext = callbackContext;
     }
-
 
     // private void setPrintData(String oneModel,String drawingRev,String
     // oneClass,String oneCode,String chipId,String dateTime,String specification){
