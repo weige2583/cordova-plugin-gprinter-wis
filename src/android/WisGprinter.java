@@ -92,6 +92,9 @@ public class WisGprinter extends CordovaPlugin {
             case "printTest": // 打印测试
                 printTest(callbackContext);
                 break;
+            case "print": // 打印
+                sendPrint(callbackContext);
+                break;
             case "getPairedDevices": // 获取已配对的蓝牙设备
                 getPairedDevices();
                 break;
@@ -551,6 +554,23 @@ public class WisGprinter extends CordovaPlugin {
         Vector<Byte> datas = tsc.getCommand();
         // 发送数据
         return datas;
+    }
+
+    private void sendPrint (CallbackContext callbackContext) {
+        if (isConnection) {
+            try {
+                Vector<Byte> datas = getTsc(0).getCommand();
+                DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].sendDataImmediately(datas);
+                callbackContext.success();
+            } catch (IOException e) {
+                callbackContext.error("发送失败！");
+                Toast.makeText(activity.getApplicationContext(), "发送失败！", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            callbackContext.error("设备未连接，请重新连接！");
+            Toast.makeText(activity.getApplicationContext(), "设备未连接，请重新连接！", Toast.LENGTH_SHORT).show();
+        }
+        Toast.makeText(activity.getApplicationContext(), "打印完成", Toast.LENGTH_SHORT).show();
     }
 
     private void printTest(final CallbackContext callbackContext) throws JSONException {
