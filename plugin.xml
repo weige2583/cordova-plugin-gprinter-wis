@@ -56,8 +56,6 @@
             target-dir="src/com/isesol/wis" />
         <source-file src="src/android/PrinterCommand.java"
             target-dir="src/com/isesol/wis" />
-        <source-file src="src/android/BluetoothPort.java"
-            target-dir="src/com/isesol/wis" />
 
         <!--<resource-file src="src/res/layout/dialog_bluetooth_list.xml"
             target="res/layout/dialog_bluetooth_list.xml" />

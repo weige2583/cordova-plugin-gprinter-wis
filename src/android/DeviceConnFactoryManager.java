@@ -13,8 +13,10 @@ import com.gprinter.io.EthernetPort;
 import com.gprinter.io.PortManager;
 import com.gprinter.io.SerialPort;
 import com.gprinter.io.UsbPort;
+import com.gprinter.command.LabelCommand;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Vector;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -26,11 +28,13 @@ import static com.isesol.wis.DeviceConnFactoryManager.CONN_METHOD.USB;
  * Created by Administrator
  *
  * @author 猿史森林
- *         Time 2017/8/2
+ * Time 2017/8/2
  */
 public class DeviceConnFactoryManager {
 
-    public BluetoothPort mPort;
+    public HashMap<Integer, LabelCommand> labels = new HashMap(20);
+
+    public PortManager mPort;
 
     private static final String TAG = DeviceConnFactoryManager.class.getSimpleName();
 
@@ -95,7 +99,7 @@ public class DeviceConnFactoryManager {
      */
     private static final int TSC_STATE_ERR_OCCURS = 0x80;
 
-    private byte[] cpcl={0x1b,0x68};
+    private byte[] cpcl = {0x1b, 0x68};
 
     /**
      * CPCL指令查询打印机实时状态 打印机缺纸状态
@@ -113,7 +117,7 @@ public class DeviceConnFactoryManager {
     private PrinterCommand currentPrinterCommand;
     public static final byte FLAG = 0x10;
     private static final int READ_DATA = 10000;
-    private static final int DEFAUIT_COMMAND=20000;
+    private static final int DEFAUIT_COMMAND = 20000;
     private static final String READ_DATA_CNT = "read_data_cnt";
     private static final String READ_BUFFER_ARRAY = "read_buffer_array";
     public static final String ACTION_CONN_STATE = "action_connect_state";
@@ -129,6 +133,7 @@ public class DeviceConnFactoryManager {
     private final int ESC = 1;
     private final int TSC = 3;
     private final int CPCL = 2;
+
     public enum CONN_METHOD {
         //蓝牙连接
         BLUETOOTH("BLUETOOTH"),
@@ -163,14 +168,12 @@ public class DeviceConnFactoryManager {
     public void openPort() {
         deviceConnFactoryManagers[id].isOpenPort = false;
         sendStateBroadcast(CONN_STATE_CONNECTING);
-        mPort = new BluetoothPort(macAddress);
-        isOpenPort = mPort.openPort();
-        /*switch (deviceConnFactoryManagers[id].connMethod) {
+        switch (deviceConnFactoryManagers[id].connMethod) {
             case BLUETOOTH:
                 mPort = new BluetoothPort(macAddress);
                 isOpenPort = mPort.openPort();
                 break;
-           *//* case USB:
+            case USB:
                 mPort = new UsbPort(mContext, mUsbDevice);
                 isOpenPort = mPort.openPort();
                 break;
@@ -181,17 +184,19 @@ public class DeviceConnFactoryManager {
             case SERIAL_PORT:
                 mPort = new SerialPort(serialPortPath, baudrate, 0);
                 isOpenPort = mPort.openPort();
-                break;*//*
-            default:
                 break;
-        }*/
+            default:
+                mPort = new BluetoothPort(macAddress);
+                isOpenPort = mPort.openPort();
+                break;
+        }
 
         //端口打开成功后，检查连接打印机所使用的打印机指令ESC、TSC
         if (isOpenPort) {
             queryCommand();
         } else {
             if (this.mPort != null) {
-                this.mPort=null;
+                this.mPort = null;
             }
             sendStateBroadcast(CONN_STATE_FAILED);
         }
@@ -270,13 +275,13 @@ public class DeviceConnFactoryManager {
      */
     public void closePort(int id) {
         if (this.mPort != null) {
-            if(reader!=null) {
+            if (reader != null) {
                 reader.cancel();
                 reader = null;
             }
-            boolean b= this.mPort.closePort();
-            if(b) {
-                this.mPort=null;
+            boolean b = this.mPort.closePort();
+            if (b) {
+                this.mPort = null;
                 isOpenPort = false;
                 currentPrinterCommand = null;
             }
@@ -395,24 +400,26 @@ public class DeviceConnFactoryManager {
         }
     }
 
-    public void sendDataImmediately(final Vector<Byte> data) {
+    public void sendDataImmediately(final Vector<Byte> data) throws IOException  {
         if (this.mPort == null) {
             return;
         }
         try {
             this.mPort.writeDataImmediately(data, 0, data.size());
-        } catch (Exception e) {//异常中断发送
+        } catch (IOException e) {//异常中断发送
+            throw e;
 //            mHandler.obtainMessage(Constant.abnormal_Disconnection).sendToTarget();
 //            e.printStackTrace();
 
         }
     }
-    public void sendByteDataImmediately(final byte [] data) {
+
+    public void sendByteDataImmediately(final byte[] data) {
         if (this.mPort == null) {
             return;
-        }else {
-            Vector<Byte> datas=new Vector<Byte>();
-            for(int i = 0; i < data.length; ++i) {
+        } else {
+            Vector<Byte> datas = new Vector<Byte>();
+            for (int i = 0; i < data.length; ++i) {
                 datas.add(Byte.valueOf(data[i]));
             }
             try {
@@ -423,6 +430,7 @@ public class DeviceConnFactoryManager {
             }
         }
     }
+
     public int readDataImmediately(byte[] buffer) throws IOException {
         return this.mPort.readData(buffer);
     }
@@ -442,13 +450,13 @@ public class DeviceConnFactoryManager {
                     @Override
                     public void run() {
                         if (currentPrinterCommand == null && queryPrinterCommandFlag > TSC) {
-                            if (getConnMethod()== CONN_METHOD.USB) {//三种状态查询，完毕均无返回值，默认票据（针对凯仕、盛源机器USB查询指令没有返回值，导致连不上）
+                            if (getConnMethod() == CONN_METHOD.USB) {//三种状态查询，完毕均无返回值，默认票据（针对凯仕、盛源机器USB查询指令没有返回值，导致连不上）
                                 currentPrinterCommand = PrinterCommand.ESC;
                                 sendStateBroadcast(CONN_STATE_CONNECTED);
                                 sendCommand = esc;
 //                                mHandler.sendMessage(mHandler.obtainMessage(DEFAUIT_COMMAND, ""));
                                 scheduledExecutorService.shutdown();
-                            }else{
+                            } else {
                                 if (reader != null) {//三种状态，查询无返回值，发送连接失败广播
                                     reader.cancel();
                                     mPort.closePort();
@@ -484,7 +492,11 @@ public class DeviceConnFactoryManager {
                         for (int i = 0; i < sendCommand.length; i++) {
                             data.add(sendCommand[i]);
                         }
-                        sendDataImmediately(data);
+                        try {
+                            sendDataImmediately(data);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                         queryPrinterCommandFlag++;
                     }
                 }), 1500, 1500, TimeUnit.MILLISECONDS);
@@ -506,9 +518,9 @@ public class DeviceConnFactoryManager {
             try {
                 while (isRun) {
                     //读取打印机返回信息,打印机没有返回纸返回-1
-                    Log.e(TAG,"wait read ");
+                    Log.e(TAG, "wait read ");
                     int len = readDataImmediately(buffer);
-                    Log.e(TAG," read "+len);
+                    Log.e(TAG, " read " + len);
                     if (len > 0) {
                         Message message = Message.obtain();
                         message.what = READ_DATA;
@@ -633,8 +645,10 @@ public class DeviceConnFactoryManager {
         }
     };
 */
+
     /**
      * 发送广播
+     *
      * @param state
      */
     private void sendStateBroadcast(int state) {
@@ -650,7 +664,6 @@ public class DeviceConnFactoryManager {
     private int judgeResponseType(byte r) {
         return (byte) ((r & FLAG) >> 4);
     }
-
 
 
 }
