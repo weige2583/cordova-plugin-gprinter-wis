@@ -41,9 +41,18 @@ exports.printTest = function (success, error) {
  * 打印，执行打印指令集，打印最后一步
  * @param {*} success
  * @param {*} error
+ * @param {*} index 打印次数
  */
 exports.print = function (success, error) {
   exec(success, error, "WisGprinter", "print", [])
+}
+/**
+ * 打印，执行打印指令集，打印最后一步
+ * @param {*} success
+ * @param {*} error
+ */
+exports.printWithCount = function (success, error, count) {
+  exec(success, error, "WisGprinter", "printWithCount", [count])
 }
 /**
  * 创建标签打印指令（打印标签的第一步）
@@ -118,8 +127,6 @@ exports.addBox = function (x_start, y_start, x_end, y_end, thickness) {
  * @param {*} height 条形码高度，以点（dot）表示
  * @param {*} readable 0 表示人眼不可识，1 表示人眼可识
  * @param {*} rotation 条形码旋转角度，顺时针方向 0,90,180,270
- * @param {*} narrow 窄bar 宽度，以点（dots）表示
- * @param {*} wide 宽度，以点（dot）表示
  * @param {*} content 打印内容
  * @returns
  */
@@ -130,8 +137,6 @@ exports.addBarCode = function (
   height,
   readable,
   rotation,
-  narrow,
-  wide,
   content
 ) {
   exec(null, null, "WisGprinter", "addBarCode", [
@@ -141,8 +146,6 @@ exports.addBarCode = function (
     height,
     readable,
     rotation,
-    narrow,
-    wide,
     content
   ])
   return exports
@@ -195,7 +198,7 @@ exports.addQRCode = function (x, y, level, width, rotation, content) {
  * @param {*} str 内容
  * @returns
  */
-exports.addText = function (x, y, font, rotation, str, x_ = 1, y_ = 1) {
+exports.addText = function (x, y, str, font = "SIMPLIFIED_CHINESE", rotation = 0, x_ = 1, y_ = 1) {
   exec(null, null, "WisGprinter", "addText", [
     x,
     y,
@@ -385,7 +388,7 @@ exports.addSelfTest = function () {
   return exports
 }
 /**
- * 将指定的区域反相打印
+ * 该指令用于清除影像缓冲区部分区域的数据
  * @param {*} x_start 反相区域左上角X 坐标，单位dot
  * @param {*} y_start 反相区域左上角Y 坐标，单位dot
  * @param {*} x_width 反相区域宽度，单位dot

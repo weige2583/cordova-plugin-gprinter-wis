@@ -50,7 +50,7 @@ public class WisGprinter extends CordovaPlugin {
     private static final String LOG_TAG = "WisGprinter";
 
     private int id = 0;
-    private String[] permissions = { Manifest.permission.ACCESS_FINE_LOCATION };
+    private String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};
     private CallbackContext mcallbackContext;
     private JSONArray requestArgs;
     // private PrinterServiceConnection conn = null;
@@ -91,8 +91,11 @@ public class WisGprinter extends CordovaPlugin {
             case "printTest": // 打印测试
                 printTest(callbackContext);
                 break;
+            case "printWithCount": // 指定打印次数后打印
+                sendPrint(args.optInt(0, 1), callbackContext);
+                break;
             case "print": // 打印
-                sendPrint(callbackContext);
+                sendPrint(1, callbackContext);
                 break;
             case "getPairedDevices": // 获取已配对的蓝牙设备
                 getPairedDevices();
@@ -117,7 +120,7 @@ public class WisGprinter extends CordovaPlugin {
                 }
                 break;
             case "addOffset": // 该指令用于控制在剥离模式时（peel-off
-                              // mode）每张卷标停止的位置，在打印下一张时打印机会将原先多推出或少推出的部分以回拉方式补偿回来。该指令仅适用于剥离模式。
+                // mode）每张卷标停止的位置，在打印下一张时打印机会将原先多推出或少推出的部分以回拉方式补偿回来。该指令仅适用于剥离模式。
                 tsc = getTsc(1);
                 if (tsc != null) {
                     tsc.addOffset(args.getInt(0));
@@ -232,7 +235,7 @@ public class WisGprinter extends CordovaPlugin {
                  */
                 tsc = getTsc(2);
                 if (tsc != null) {
-                    tsc.addPrint(args.getInt(0), args.getInt(1));
+                    tsc.addPrint(args.getInt(0), args.optInt(1, 1));
                 } else {
                     result = false;
                 }
@@ -244,7 +247,7 @@ public class WisGprinter extends CordovaPlugin {
                  */
                 tsc = getTsc(2);
                 if (tsc != null) {
-                    tsc.addSound(args.getInt(0), args.getInt(1));
+                    tsc.addSound(args.optInt(0, 1), args.optInt(1, 1));
                 } else {
                     result = false;
                 }
@@ -261,9 +264,9 @@ public class WisGprinter extends CordovaPlugin {
                 }
                 break;
             case "addSelfTest": // 打印自检页
-                tsc = getTsc(1);
+                tsc = getTsc(0);
                 if (tsc != null) {
-                    tsc.addSelfTest(args.getInt(0));
+                    tsc.addSelfTest();
                 } else {
                     result = false;
                 }
@@ -287,7 +290,7 @@ public class WisGprinter extends CordovaPlugin {
                  */
                 tsc = getTsc(5);
                 if (tsc != null) {
-                    tsc.addBox(args.getInt(0), args.getInt(1), args.getInt(2), args.getInt(3), args.getInt(3));
+                    tsc.addBox(args.getInt(0), args.getInt(1), args.getInt(2), args.getInt(3), args.getInt(4));
                 } else {
                     result = false;
                 }
@@ -303,8 +306,8 @@ public class WisGprinter extends CordovaPlugin {
                     tsc.add1DBarcode(args.getInt(0), args.getInt(1),
                             LabelCommand.BARCODETYPE.valueOf(args.getString(2)), args.getInt(3),
                             LabelCommand.READABEL.values()[args.getInt(4)],
-                            LabelCommand.ROTATION.valueOf("ROTATION_" + args.getInt(5)), args.getInt(6), args.getInt(7),
-                            args.getString(8));
+                            LabelCommand.ROTATION.valueOf("ROTATION_" + args.getInt(5)),
+                            args.getString(6));
                 } else {
                     result = false;
                 }
@@ -312,12 +315,12 @@ public class WisGprinter extends CordovaPlugin {
             /*
              * case "addBitmap": // TODO
              *//**
-                * 打印图片（单色图片） res为画布参数
-                *//*
-                   * tsc = getTsc(4); if (tsc != null) { tsc.addBitmap(args.getInt(0),
-                   * args.getInt(1), LabelCommand.BITMAP_MODE.valueOf(args.getString(2)),
-                   * args.getInt(3)); } else { result = false; } break;
-                   */
+             * 打印图片（单色图片） res为画布参数
+             *//*
+             * tsc = getTsc(4); if (tsc != null) { tsc.addBitmap(args.getInt(0),
+             * args.getInt(1), LabelCommand.BITMAP_MODE.valueOf(args.getString(2)),
+             * args.getInt(3)); } else { result = false; } break;
+             */
             case "addErase":
                 /**
                  * 将指定的区域反相打印 传入参数说明 x_start 反相区域左上角X 坐标，单位dot y_start 反相区域左上角Y 坐标，单位dot x_width
@@ -353,10 +356,14 @@ public class WisGprinter extends CordovaPlugin {
                  */
                 tsc = getTsc(7);
                 if (tsc != null) {
-                    tsc.addText(args.getInt(0), args.getInt(1), LabelCommand.FONTTYPE.valueOf(args.getString(2)),
+                    tsc.addText(args.getInt(0), args.getInt(1),
+                            LabelCommand.FONTTYPE.valueOf(args.getString(2)),
                             LabelCommand.ROTATION.valueOf("ROTATION_" + args.getInt(3)),
+//                            LabelCommand.FONTMUL.MUL_1,
+//                            LabelCommand.FONTMUL.MUL_1,
                             LabelCommand.FONTMUL.valueOf("MUL_" + args.getInt(4)),
-                            LabelCommand.FONTMUL.valueOf("MUL_" + args.getInt(5)), args.getString(6));
+                            LabelCommand.FONTMUL.valueOf("MUL_" + args.getInt(5)),
+                            args.getString(6));
                 } else {
                     result = false;
                 }
@@ -370,7 +377,8 @@ public class WisGprinter extends CordovaPlugin {
                 if (tsc != null) {
                     tsc.addQRCode(args.getInt(0), args.getInt(1),
                             LabelCommand.EEC.valueOf("LEVEL_" + args.getString(2)),
-                            LabelCommand.ROTATION.valueOf("ROTATION_" + args.getInt(3)), args.getInt(4),
+                            args.getInt(3),
+                            LabelCommand.ROTATION.valueOf("ROTATION_" + args.getInt(4)),
                             args.getString(5));
                 } else {
                     result = false;
@@ -382,7 +390,7 @@ public class WisGprinter extends CordovaPlugin {
                  */
                 tsc = getTsc(1);
                 if (tsc != null) {
-                    tsc.addPeel(LabelCommand.ENABLE.values()[args.getInt(0)]);
+                    tsc.addPeel(EscCommand.ENABLE.values()[args.getInt(0)]);
                 } else {
                     result = false;
                 }
@@ -394,7 +402,7 @@ public class WisGprinter extends CordovaPlugin {
                  */
                 tsc = getTsc(1);
                 if (tsc != null) {
-                    tsc.addTear(LabelCommand.ENABLE.values()[args.getInt(0)]);
+                    tsc.addTear(EscCommand.ENABLE.values()[args.getInt(0)]);
                 } else {
                     result = false;
                 }
@@ -405,7 +413,7 @@ public class WisGprinter extends CordovaPlugin {
                  */
                 tsc = getTsc(1);
                 if (tsc != null) {
-                    tsc.addReprint(LabelCommand.ENABLE.values()[args.getInt(0)]);
+                    tsc.addReprint(EscCommand.ENABLE.values()[args.getInt(0)]);
                 } else {
                     result = false;
                 }
@@ -417,7 +425,7 @@ public class WisGprinter extends CordovaPlugin {
                  */
                 tsc = getTsc(1);
                 if (tsc != null) {
-                    tsc.addCutter(LabelCommand.ENABLE.values()[args.getInt(0)]);
+                    tsc.addCutter(EscCommand.ENABLE.values()[args.getInt(0)]);
                 } else {
                     result = false;
                 }
@@ -428,7 +436,7 @@ public class WisGprinter extends CordovaPlugin {
                  */
                 tsc = getTsc(1);
                 if (tsc != null) {
-                    tsc.addCutterPieces(args.getInt(0));
+                    tsc.addCutterPieces((short) args.optInt(0, 1));
                 } else {
                     result = false;
                 }
@@ -507,10 +515,15 @@ public class WisGprinter extends CordovaPlugin {
         return datas;
     }
 
-    private void sendPrint(CallbackContext callbackContext) {
+    private void sendPrint(int pageCount, CallbackContext callbackContext) {
         if (isConnection) {
             try {
-                Vector<Byte> datas = getTsc(0).getCommand();
+                LabelCommand tsc = getTsc(0);
+                if (pageCount > 0) {
+                    tsc.addPrint(pageCount, 1);
+                }
+
+                Vector<Byte> datas = tsc.getCommand();
                 DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].sendDataImmediately(datas);
                 callbackContext.success();
             } catch (IOException e) {
@@ -576,13 +589,17 @@ public class WisGprinter extends CordovaPlugin {
     }
 
     private LabelCommand getTsc(int paramsSize) {
-        int labelIndex = 0;
-        if (this.requestArgs.size() > paramsSize) {
-            labelIndex = this.requestArgs.getInt(this.requestArgs.size() - 1);
+        try {
+            int labelIndex = 0;
+            if (this.requestArgs.length() > paramsSize) {
+                labelIndex = this.requestArgs.getInt(this.requestArgs.length() - 1);
+            }
+            if (DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].labels.containsKey(labelIndex)) {
+                return DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].labels.get(labelIndex);
+            }
+        } catch (JSONException e) {
         }
-        if (DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].labels.containsKey(labelIndex)) {
-            return DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].labels.get(labelIndex);
-        }
+
         return null;
     }
 
@@ -593,10 +610,14 @@ public class WisGprinter extends CordovaPlugin {
      * @param callbackContext
      */
     private void createTsc(JSONArray args, CallbackContext callbackContext) {
-        int commandIndex = args.getInt(0);
-        LabelCommand tsc = new LabelCommand();
-        DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].labels.put(commandIndex, tsc);
-        callbackContext.success("ok");
+        try {
+            int commandIndex = args.getInt(0);
+            LabelCommand tsc = new LabelCommand();
+            DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].labels.put(commandIndex, tsc);
+            callbackContext.success("ok");
+        } catch (JSONException e) {
+        }
+
     }
 
     /**
