@@ -1,3 +1,4 @@
+package com.isesol.wis;
 /**
  * Created by Administrator
  *

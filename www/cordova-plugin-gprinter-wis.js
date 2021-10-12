@@ -1,6 +1,16 @@
 var exec = require("cordova/exec")
 
 /**
+ * 初始化蓝牙
+ * @param {*} params {request: true}
+ * @param {*} success
+ * @param {*} error
+ */
+exports.initialize = function (params, success, error) {
+  exec(success, error, "WisGprinter", "initialize", [params])
+}
+
+/**
  * 连接打印机
  * @param {*} address
  * @param {*} success

@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin xmlns:android="http://schemas.android.com/apk/res/android" id="com.isesol.wis"
+<plugin xmlns:android="http://schemas.android.com/apk/res/android" id="cordova-plugin-gprinter-wis"
     version="0.0.1" xmlns="http://apache.org/cordova/ns/plugins/1.0">
     <name>cordova-plugin-gprinter-wis</name>
     <description>A Cordova Plugin of Gprinter Bluetooth from WIS</description>
@@ -55,6 +55,8 @@
         <source-file src="src/android/ThreadPool.java"
             target-dir="src/com/isesol/wis" />
         <source-file src="src/android/PrinterCommand.java"
+            target-dir="src/com/isesol/wis" />
+        <source-file src="src/android/Utils.java"
             target-dir="src/com/isesol/wis" />
 
         <!--<resource-file src="src/res/layout/dialog_bluetooth_list.xml"

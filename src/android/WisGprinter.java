@@ -37,21 +37,46 @@ import android.widget.Toast;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.bluetooth.BluetoothManager;
 import android.content.*;
 import android.os.*;
 import android.app.Activity;
 import android.view.*;
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 
 public class WisGprinter extends CordovaPlugin {
 
     private final int REQUEST_ACCESS_FINE_LOCATION = 59628;
+    private final int REQUEST_BT_ENABLE = 59627; /*Random integer*/
     private static final String LOG_TAG = "WisGprinter";
+    private final String keyStatusReceiver = "statusReceiver";
+    private final String keyStatus = "status";
+    private final String keyError = "error";
+    private final String keyMessage = "message";
+    private final String keyRequest = "request";
+    private final String statusDisabled = "disabled";
+    private final String statusEnabled = "enabled";
+    private final String logNotEnabled = "蓝牙不可用";
 
     private int id = 0;
     private String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};
+
+
+    // callbacks
+    private CallbackContext connectCallback;
+    private CallbackContext initCallbackContext;
+    private CallbackContext dataAvailableCallback;
+    private CallbackContext rawDataAvailableCallback;
+    private CallbackContext enableBluetoothCallback;
+    private CallbackContext deviceDiscoveredCallback;
     private CallbackContext mcallbackContext;
+    private BluetoothAdapter bluetoothAdapter;
+
+
+
     private JSONArray requestArgs;
     // private PrinterServiceConnection conn = null;
     // private GpService mGpService = null;
@@ -76,6 +101,9 @@ public class WisGprinter extends CordovaPlugin {
         LabelCommand tsc;
         boolean result = true;
         switch (action) {
+            case "initialize": // 初始化蓝牙
+                initializeAction(args, callbackContext);
+                break;
             case "connectDevice": // 连接选中的蓝牙设备(打印机)
                 // android permission auto add
                 if (!hasPermisssion()) {
@@ -98,7 +126,7 @@ public class WisGprinter extends CordovaPlugin {
                 sendPrint(1, callbackContext);
                 break;
             case "getPairedDevices": // 获取已配对的蓝牙设备
-                getPairedDevices();
+                getPairedDevices(callbackContext);
                 break;
             case "createTsc": // 创建标签打印（打印标签的第一步）
                 createTsc(args, callbackContext);
@@ -457,25 +485,166 @@ public class WisGprinter extends CordovaPlugin {
         return result;
     }
 
-    private void getPairedDevices() {
+    //General Helpers
+    private void addProperty(JSONObject obj, String key, Object value) {
+        //Believe exception only occurs when adding duplicate keys, so just ignore it
+        try {
+            if (value == null) {
+                obj.put(key, JSONObject.NULL);
+            } else {
+                obj.put(key, value);
+            }
+        } catch (JSONException e) {
+        }
+    }
+
+    private JSONObject getArgsObject(JSONArray args) {
+        if (args.length() == 1) {
+            try {
+                return args.getJSONObject(0);
+            } catch (JSONException ex) {
+            }
+        }
+
+        return null;
+    }
+
+    private boolean getStatusReceiver(JSONObject obj) {
+        return obj.optBoolean(keyStatusReceiver, true);
+    }
+
+    private boolean getRequest(JSONObject obj) {
+        return obj.optBoolean(keyRequest, false);
+    }
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (initCallbackContext == null) {
+                return;
+            }
+
+            if (intent.getAction().equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
+                JSONObject returnObj = new JSONObject();
+                PluginResult pluginResult;
+
+                switch (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)) {
+                    case BluetoothAdapter.STATE_OFF:
+                        addProperty(returnObj, keyStatus, statusDisabled);
+                        addProperty(returnObj, keyMessage, logNotEnabled);
+                        pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
+                        pluginResult.setKeepCallback(true);
+                        initCallbackContext.sendPluginResult(pluginResult);
+                        break;
+                    case BluetoothAdapter.STATE_ON:
+
+                        addProperty(returnObj, keyStatus, statusEnabled);
+
+                        pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
+                        pluginResult.setKeepCallback(true);
+                        initCallbackContext.sendPluginResult(pluginResult);
+                        break;
+                }
+            }
+        }
+    };
+
+    private void initializeAction(JSONArray args, CallbackContext callbackContext) {
+        //Save init callback
+        initCallbackContext = callbackContext;
+
+        if (bluetoothAdapter != null) {
+            JSONObject returnObj = new JSONObject();
+            PluginResult pluginResult;
+
+            if (bluetoothAdapter.isEnabled()) {
+                addProperty(returnObj, keyStatus, statusEnabled);
+
+                pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
+                pluginResult.setKeepCallback(true);
+                initCallbackContext.sendPluginResult(pluginResult);
+            } else {
+                addProperty(returnObj, keyStatus, statusDisabled);
+                addProperty(returnObj, keyMessage, logNotEnabled);
+
+                pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
+                pluginResult.setKeepCallback(true);
+                initCallbackContext.sendPluginResult(pluginResult);
+            }
+
+            return;
+        }
+
+
+        JSONObject obj = getArgsObject(args);
+
+        if (obj != null && getStatusReceiver(obj)) {
+            //Add a receiver to pick up when Bluetooth state changes
+            activity.registerReceiver(mReceiver, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
+        }
+
+        //Get Bluetooth adapter via Bluetooth Manager
+        BluetoothManager bluetoothManager = (BluetoothManager) activity.getSystemService(Context.BLUETOOTH_SERVICE);
+        bluetoothAdapter = bluetoothManager.getAdapter();
+
+
+        JSONObject returnObj = new JSONObject();
+
+        //If it's already enabled,
+        if (bluetoothAdapter.isEnabled()) {
+            addProperty(returnObj, keyStatus, statusEnabled);
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
+            pluginResult.setKeepCallback(true);
+            initCallbackContext.sendPluginResult(pluginResult);
+            return;
+        }
+
+        boolean request = false;
+        if (obj != null) {
+            request = getRequest(obj);
+        }
+
+        //Request user to enable Bluetooth
+        if (request) {
+            //Request Bluetooth to be enabled
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            cordova.startActivityForResult(this, enableBtIntent, REQUEST_BT_ENABLE);
+        } else {
+            //No request, so send back not enabled
+            addProperty(returnObj, keyStatus, statusDisabled);
+            addProperty(returnObj, keyMessage, logNotEnabled);
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
+            pluginResult.setKeepCallback(true);
+            initCallbackContext.sendPluginResult(pluginResult);
+        }
+    }
+
+
+
+    private void getPairedDevices(CallbackContext callbackContext) throws JSONException {
 
         // Get the local Bluetooth adapter
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         // Get a set of currently paired devices
         Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
         // If there are paired devices, add each one to the ArrayAdapter
-        if (pairedDevices.size() > 0) {
-            String str = "";
-            for (BluetoothDevice device : pairedDevices) {
+        JSONArray deviceList = new JSONArray();
 
-                str += device.getName() + "&" + device.getAddress() + ",";
-
-            }
-            String jsEvent = String.format(
-                    "cordova.fireDocumentEvent('bluetoothprint.DataReceived',{'bluetoothPrintData':'%s'})", str);
-            webView.sendJavascript(jsEvent);
+        for (BluetoothDevice device : pairedDevices) {
+            deviceList.put(deviceToJSON(device));
         }
+        callbackContext.success(deviceList);
 
+    }
+
+    private JSONObject deviceToJSON(BluetoothDevice device) throws JSONException {
+        JSONObject json = new JSONObject();
+        json.put("name", device.getName());
+        json.put("address", device.getAddress());
+        json.put("id", device.getAddress());
+        if (device.getBluetoothClass() != null) {
+            json.put("class", device.getBluetoothClass().getDeviceClass());
+        }
+        return json;
     }
 
     private Vector<Byte> getLabel() {
@@ -525,7 +694,7 @@ public class WisGprinter extends CordovaPlugin {
 
                 Vector<Byte> datas = tsc.getCommand();
                 DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].sendDataImmediately(datas);
-                callbackContext.success();
+
             } catch (IOException e) {
                 callbackContext.error("发送失败！");
                 Toast.makeText(activity.getApplicationContext(), "发送失败！", Toast.LENGTH_SHORT).show();
@@ -534,7 +703,8 @@ public class WisGprinter extends CordovaPlugin {
             callbackContext.error("设备未连接，请重新连接！");
             Toast.makeText(activity.getApplicationContext(), "设备未连接，请重新连接！", Toast.LENGTH_SHORT).show();
         }
-        Toast.makeText(activity.getApplicationContext(), "打印完成", Toast.LENGTH_SHORT).show();
+        callbackContext.success();
+        Toast.makeText(activity.getApplicationContext(), "打印指令已发送", Toast.LENGTH_SHORT).show();
     }
 
     private void printTest(final CallbackContext callbackContext) throws JSONException {
@@ -566,7 +736,8 @@ public class WisGprinter extends CordovaPlugin {
         if (!isConnection) {
             try {
                 closePort();
-                new DeviceConnFactoryManager.Build().setId(id).setMacAddress(macAddress)
+                connectCallback = callbackContext;
+                new DeviceConnFactoryManager.Build().setId(id).setMacAddress(macAddress).setContext(activity.getApplicationContext()).setCallback(callbackContext)
                         .setConnMethod(DeviceConnFactoryManager.CONN_METHOD.BLUETOOTH).build();
                 DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].openPort();
                 isConnection = true;
@@ -577,15 +748,31 @@ public class WisGprinter extends CordovaPlugin {
             } catch (Exception e) {
                 isConnection = false;
                 Toast.makeText(activity.getApplicationContext(), "连接失败！", 1).show();
-
+                callbackContext.error("连接失败");
             }
-            Toast.makeText(activity.getApplicationContext(), "连接成功！", Toast.LENGTH_SHORT).show();
+            String deviceName = DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].getCurrentBluetoothDevice().getName();
+            Toast.makeText(activity.getApplicationContext(), deviceName + "连接成功！", Toast.LENGTH_SHORT).show();
             if (isConnection) {
-                callbackContext.success(macAddress);
+                notifyConnectionSuccess(macAddress);
             }
 
         }
 
+    }
+
+    private void notifyConnectionLost(String error) {
+        if (connectCallback != null) {
+            connectCallback.error(error);
+            connectCallback = null;
+        }
+    }
+
+    private void notifyConnectionSuccess(String data) {
+        if (connectCallback != null) {
+            PluginResult result = new PluginResult(PluginResult.Status.OK, data);
+            result.setKeepCallback(true);
+            connectCallback.sendPluginResult(result);
+        }
     }
 
     private LabelCommand getTsc(int paramsSize) {
