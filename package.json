@@ -1,9 +1,9 @@
 {
-  "name": "cordova-plugin-gprinter-wis",
+  "name": "cordova-plugin-wis-gprinter",
   "version": "0.0.1",
   "description": "A Cordova Plugin of Gprinter Bluetooth from WIS",
   "cordova": {
-    "id": "cordova-plugin-gprinter-wis",
+    "id": "cordova-plugin-wis-gprinter",
     "platforms": [
       "android"
     ]
@@ -20,6 +20,6 @@
   "license": "Apache 2.0 License",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/weige2583/cordova-plugin-gprinter-wis.git"
+    "url": "git+https://github.com/weige2583/cordova-plugin-wis-gprinter.git"
   }
 }
