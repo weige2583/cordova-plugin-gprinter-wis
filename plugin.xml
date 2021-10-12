@@ -1,12 +1,12 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin xmlns:android="http://schemas.android.com/apk/res/android" id="cordova-plugin-gprinter-wis"
+<plugin xmlns:android="http://schemas.android.com/apk/res/android" id="cordova-plugin-wis-gprinter"
     version="0.0.1" xmlns="http://apache.org/cordova/ns/plugins/1.0">
-    <name>cordova-plugin-gprinter-wis</name>
+    <name>cordova-plugin-wis-gprinter</name>
     <description>A Cordova Plugin of Gprinter Bluetooth from WIS</description>
     <author>Greg.Xie</author>
     <keywords>Android,Gprinter,Bluetooth,Cordova</keywords>
     <license>Apache 2.0 License</license>
-    <js-module name="cordova-plugin-gprinter-wis" src="www/cordova-plugin-gprinter-wis.js">
+    <js-module name="cordova-plugin-wis-gprinter" src="www/cordova-plugin-wis-gprinter.js">
         <clobbers target="wis.Gprinter" />
     </js-module>
     <platform name="android">
@@ -37,13 +37,6 @@
             <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
             <uses-feature android:name="android.hardware.usb.host" />
         </config-file>
-        <!--<config-file parent="/manifest/application" target="AndroidManifest.xml">
-            <activity android:name="BluetoothDeviceList"
-                android:configChanges="keyboardHidden|orientation|screenSize" android:label="蓝牙设备列表"
-                android:theme="@android:style/Theme.Dialog" />
-        </config-file>-->
-        <!--<source-file src="src/android/BluetoothDeviceList.java"
-            target-dir="src/com/isesol/txcd" />-->
         <source-file src="src/android/WisGprinter.java"
             target-dir="src/com/isesol/wis" />
         <source-file src="src/android/Constant.java"
@@ -58,21 +51,6 @@
             target-dir="src/com/isesol/wis" />
         <source-file src="src/android/Utils.java"
             target-dir="src/com/isesol/wis" />
-
-        <!--<resource-file src="src/res/layout/dialog_bluetooth_list.xml"
-            target="res/layout/dialog_bluetooth_list.xml" />
-        <resource-file src="src/res/layout/bluetooth_device_name_item.xml"
-            target="res/layout/bluetooth_device_name_item.xml" />
-        <resource-file  src="src/res/values/strings.xml"
-            target="res/values/strings.xml" />
-        <resource-file src="src/res/values/colors.xml"
-            target="res/values/colors.xml" />
-        <resource-file
-            src="src/res/drawable/button_style.xml" target="res/drawable/button_style.xml" />
-        <resource-file
-            src="src/res/drawable/background_corner.xml" target="res/drawable/background_corner.xml" />
-        <resource-file
-            src="src/res/values-zh-rCN/strings.xml" target="res/values-zh-rCN/strings.xml" />-->
         <lib-file src="GprinterLibs/gprintersdkv2.jar" />
         <lib-file src="GprinterLibs/jcc-bate-0.7.3.jar" />
         <lib-file src="GprinterLibs/ksoap2-android-assembly-2.5.2-jar-with-dependencies.jar" />
