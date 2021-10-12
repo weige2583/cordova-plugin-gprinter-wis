@@ -17,5 +17,9 @@
     "cordova-android"
   ],
   "author": "Greg.Xie",
-  "license": "Apache 2.0 License"
+  "license": "Apache 2.0 License",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/weige2583/cordova-plugin-gprinter-wis.git"
+  }
 }
