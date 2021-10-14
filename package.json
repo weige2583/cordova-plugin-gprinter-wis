@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-wis-gprinter",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A Cordova Plugin of Gprinter Bluetooth from WIS",
   "cordova": {
     "id": "cordova-plugin-wis-gprinter",
