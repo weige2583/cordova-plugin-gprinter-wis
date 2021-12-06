@@ -2,6 +2,10 @@
   "name": "cordova-plugin-wis-gprinter",
   "version": "0.0.2",
   "description": "A Cordova Plugin of Gprinter Bluetooth from WIS",
+  "scripts": {
+    "doc": "jsdoc -d doc ./www/cordova-plugin-wis-gprinter.js",
+    "build:docs": "npx jsdoc-to-markdown -f www/*.js > README.md"
+  },
   "cordova": {
     "id": "cordova-plugin-wis-gprinter",
     "platforms": [
@@ -21,5 +25,8 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/weige2583/cordova-plugin-wis-gprinter.git"
+  },
+  "devDependencies": {
+    "jsdoc-to-markdown": "^7.1.0"
   }
 }

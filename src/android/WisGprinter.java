@@ -50,7 +50,7 @@ import android.content.Context;
 public class WisGprinter extends CordovaPlugin {
 
     private final int REQUEST_ACCESS_FINE_LOCATION = 59628;
-    private final int REQUEST_BT_ENABLE = 59627; /*Random integer*/
+    private final int REQUEST_BT_ENABLE = 59627; /* Random integer */
     private static final String LOG_TAG = "WisGprinter";
     private final String keyStatusReceiver = "statusReceiver";
     private final String keyStatus = "status";
@@ -62,8 +62,7 @@ public class WisGprinter extends CordovaPlugin {
     private final String logNotEnabled = "蓝牙不可用";
 
     private int id = 0;
-    private String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};
-
+    private String[] permissions = { Manifest.permission.ACCESS_FINE_LOCATION };
 
     // callbacks
     private CallbackContext connectCallback;
@@ -74,8 +73,6 @@ public class WisGprinter extends CordovaPlugin {
     private CallbackContext deviceDiscoveredCallback;
     private CallbackContext mcallbackContext;
     private BluetoothAdapter bluetoothAdapter;
-
-
 
     private JSONArray requestArgs;
     // private PrinterServiceConnection conn = null;
@@ -103,6 +100,9 @@ public class WisGprinter extends CordovaPlugin {
         switch (action) {
             case "initialize": // 初始化蓝牙
                 initializeAction(args, callbackContext);
+                break;
+            case "isOpenStatus": // 判断打印机是否连接
+                isOpenStatus(callbackContext);
                 break;
             case "connectDevice": // 连接选中的蓝牙设备(打印机)
                 // android permission auto add
@@ -343,12 +343,12 @@ public class WisGprinter extends CordovaPlugin {
             /*
              * case "addBitmap": // TODO
              *//**
-             * 打印图片（单色图片） res为画布参数
-             *//*
-             * tsc = getTsc(4); if (tsc != null) { tsc.addBitmap(args.getInt(0),
-             * args.getInt(1), LabelCommand.BITMAP_MODE.valueOf(args.getString(2)),
-             * args.getInt(3)); } else { result = false; } break;
-             */
+                * 打印图片（单色图片） res为画布参数
+                *//*
+                   * tsc = getTsc(4); if (tsc != null) { tsc.addBitmap(args.getInt(0),
+                   * args.getInt(1), LabelCommand.BITMAP_MODE.valueOf(args.getString(2)),
+                   * args.getInt(3)); } else { result = false; } break;
+                   */
             case "addErase":
                 /**
                  * 将指定的区域反相打印 传入参数说明 x_start 反相区域左上角X 坐标，单位dot y_start 反相区域左上角Y 坐标，单位dot x_width
@@ -387,8 +387,8 @@ public class WisGprinter extends CordovaPlugin {
                     tsc.addText(args.getInt(0), args.getInt(1),
                             LabelCommand.FONTTYPE.valueOf(args.getString(2)),
                             LabelCommand.ROTATION.valueOf("ROTATION_" + args.getInt(3)),
-//                            LabelCommand.FONTMUL.MUL_1,
-//                            LabelCommand.FONTMUL.MUL_1,
+                            // LabelCommand.FONTMUL.MUL_1,
+                            // LabelCommand.FONTMUL.MUL_1,
                             LabelCommand.FONTMUL.valueOf("MUL_" + args.getInt(4)),
                             LabelCommand.FONTMUL.valueOf("MUL_" + args.getInt(5)),
                             args.getString(6));
@@ -485,9 +485,9 @@ public class WisGprinter extends CordovaPlugin {
         return result;
     }
 
-    //General Helpers
+    // General Helpers
     private void addProperty(JSONObject obj, String key, Object value) {
-        //Believe exception only occurs when adding duplicate keys, so just ignore it
+        // Believe exception only occurs when adding duplicate keys, so just ignore it
         try {
             if (value == null) {
                 obj.put(key, JSONObject.NULL);
@@ -516,6 +516,7 @@ public class WisGprinter extends CordovaPlugin {
     private boolean getRequest(JSONObject obj) {
         return obj.optBoolean(keyRequest, false);
     }
+
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -548,8 +549,19 @@ public class WisGprinter extends CordovaPlugin {
         }
     };
 
+    private void isOpenStatus(CallbackContext callbackContext) {
+        try {
+            Boolean isConnent = DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].getConnState();
+            callbackContext.success(isConnent ? "open" : "close");
+        } catch (Exception e) {
+            isConnection = false;
+            callbackContext.error("close");
+        }
+
+    }
+
     private void initializeAction(JSONArray args, CallbackContext callbackContext) {
-        //Save init callback
+        // Save init callback
         initCallbackContext = callbackContext;
 
         if (bluetoothAdapter != null) {
@@ -574,22 +586,20 @@ public class WisGprinter extends CordovaPlugin {
             return;
         }
 
-
         JSONObject obj = getArgsObject(args);
 
         if (obj != null && getStatusReceiver(obj)) {
-            //Add a receiver to pick up when Bluetooth state changes
+            // Add a receiver to pick up when Bluetooth state changes
             activity.registerReceiver(mReceiver, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
         }
 
-        //Get Bluetooth adapter via Bluetooth Manager
+        // Get Bluetooth adapter via Bluetooth Manager
         BluetoothManager bluetoothManager = (BluetoothManager) activity.getSystemService(Context.BLUETOOTH_SERVICE);
         bluetoothAdapter = bluetoothManager.getAdapter();
 
-
         JSONObject returnObj = new JSONObject();
 
-        //If it's already enabled,
+        // If it's already enabled,
         if (bluetoothAdapter.isEnabled()) {
             addProperty(returnObj, keyStatus, statusEnabled);
             PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
@@ -603,13 +613,13 @@ public class WisGprinter extends CordovaPlugin {
             request = getRequest(obj);
         }
 
-        //Request user to enable Bluetooth
+        // Request user to enable Bluetooth
         if (request) {
-            //Request Bluetooth to be enabled
+            // Request Bluetooth to be enabled
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             cordova.startActivityForResult(this, enableBtIntent, REQUEST_BT_ENABLE);
         } else {
-            //No request, so send back not enabled
+            // No request, so send back not enabled
             addProperty(returnObj, keyStatus, statusDisabled);
             addProperty(returnObj, keyMessage, logNotEnabled);
             PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
@@ -617,8 +627,6 @@ public class WisGprinter extends CordovaPlugin {
             initCallbackContext.sendPluginResult(pluginResult);
         }
     }
-
-
 
     private void getPairedDevices(CallbackContext callbackContext) throws JSONException {
 
@@ -737,7 +745,8 @@ public class WisGprinter extends CordovaPlugin {
             try {
                 closePort();
                 connectCallback = callbackContext;
-                new DeviceConnFactoryManager.Build().setId(id).setMacAddress(macAddress).setContext(activity.getApplicationContext()).setCallback(callbackContext)
+                new DeviceConnFactoryManager.Build().setId(id).setMacAddress(macAddress)
+                        .setContext(activity.getApplicationContext()).setCallback(callbackContext)
                         .setConnMethod(DeviceConnFactoryManager.CONN_METHOD.BLUETOOTH).build();
                 DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].openPort();
                 isConnection = true;
@@ -750,7 +759,8 @@ public class WisGprinter extends CordovaPlugin {
                 Toast.makeText(activity.getApplicationContext(), "连接失败！", 1).show();
                 callbackContext.error("连接失败");
             }
-            String deviceName = DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].getCurrentBluetoothDevice().getName();
+            String deviceName = DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].getCurrentBluetoothDevice()
+                    .getName();
             Toast.makeText(activity.getApplicationContext(), deviceName + "连接成功！", Toast.LENGTH_SHORT).show();
             if (isConnection) {
                 notifyConnectionSuccess(macAddress);

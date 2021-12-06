@@ -5,6 +5,7 @@ var exec = require("cordova/exec")
  * @param {*} params {request: true}
  * @param {*} success
  * @param {*} error
+ * @returns {}
  */
 exports.initialize = function (params, success, error) {
   exec(success, error, "WisGprinter", "initialize", [params])
@@ -15,15 +16,26 @@ exports.initialize = function (params, success, error) {
  * @param {*} address
  * @param {*} success
  * @param {*} error
+ * @returns {}
  */
 exports.connectDevice = function (address, success, error) {
   exec(success, error, "WisGprinter", "connectDevice", [address])
+}
+/**
+ * 判断蓝牙打印机是否连接
+ * @param {*}} success (open/close)
+ * @param {*} error
+ * @returns {}
+ */
+exports.isOpenStatus = function (success, error) {
+  exec(success, error, "WisGprinter", "isOpenStatus")
 }
 
 /**
  * 获取已配对的蓝牙设备
  * @param {*} success
  * @param {*} error
+ * @returns {}
  */
 exports.getPairedDevices = function (success, error) {
   exec(success, error, "WisGprinter", "getPairedDevices", [])
@@ -33,6 +45,7 @@ exports.getPairedDevices = function (success, error) {
  * 关闭连接
  * @param {*} success
  * @param {*} error
+ * @returns {}
  */
 exports.closeConnect = function (success, error) {
   exec(success, error, "WisGprinter", "closeConnect", [])
@@ -42,6 +55,7 @@ exports.closeConnect = function (success, error) {
  * 打印测试
  * @param {*} success
  * @param {*} error
+ * @returns {}
  */
 exports.printTest = function (success, error) {
   exec(success, error, "WisGprinter", "printTest", [])
@@ -52,6 +66,7 @@ exports.printTest = function (success, error) {
  * @param {*} success
  * @param {*} error
  * @param {*} index 打印次数
+ * @returns {}
  */
 exports.print = function (success, error) {
   exec(success, error, "WisGprinter", "print", [])
@@ -60,6 +75,7 @@ exports.print = function (success, error) {
  * 打印，执行打印指令集，打印最后一步
  * @param {*} success
  * @param {*} error
+ * @returns {}
  */
 exports.printWithCount = function (success, error, count) {
   exec(success, error, "WisGprinter", "printWithCount", [count])
@@ -67,7 +83,7 @@ exports.printWithCount = function (success, error, count) {
 /**
  * 创建标签打印指令（打印标签的第一步）
  * @param {*} index
- * @returns
+ * @returns {}
  */
 exports.createTsc = function (index = 0) {
   exec(null, null, "WisGprinter", "createTsc", [index])
@@ -77,7 +93,7 @@ exports.createTsc = function (index = 0) {
  * 该指令用于设定卷标纸的宽度和长度
  * @param {*} pageWidth 标签宽度 单位mm
  * @param {*} pageHeight 标签高度 单位mm
- * @returns
+ * @returns {}
  */
 exports.addSize = function (pageWidth, pageHeight) {
   exec(null, null, "WisGprinter", "addSize", [pageWidth, pageHeight])
@@ -86,7 +102,7 @@ exports.addSize = function (pageWidth, pageHeight) {
 /**
  * 该指令用于定义两张卷标纸间的垂直间距距离
  * @param {*} printGap 标签间隙 单位mm
- * @returns
+ * @returns {}
  */
 exports.addGap = function (printGap) {
   exec(null, null, "WisGprinter", "addGap", [printGap])
@@ -98,7 +114,7 @@ exports.addGap = function (printGap) {
  * @param {*} y 线条左上角Y 坐标，单位dots
  * @param {*} width 线宽，单位dots
  * @param {*} height 线高，单位dots
- * @returns
+ * @returns {}
  */
 exports.addBar = function (x, y, width, height) {
   exec(null, null, "WisGprinter", "addBar", [x, y, width, height])
@@ -111,7 +127,7 @@ exports.addBar = function (x, y, width, height) {
  * @param {*} x_end 方框右下角X 坐标，单位dots
  * @param {*} y_end 方框右下角Y 坐标，单位dots
  * @param {*} thickness 方框线宽，单位dots
- * @returns
+ * @returns {}
  */
 exports.addBox = function (x_start, y_start, x_end, y_end, thickness) {
   exec(null, null, "WisGprinter", "addBox", [
@@ -138,7 +154,7 @@ exports.addBox = function (x_start, y_start, x_end, y_end, thickness) {
  * @param {*} readable 0 表示人眼不可识，1 表示人眼可识
  * @param {*} rotation 条形码旋转角度，顺时针方向 0,90,180,270
  * @param {*} content 打印内容
- * @returns
+ * @returns {}
  */
 exports.addBarCode = function (
   x,
@@ -168,7 +184,7 @@ exports.addBarCode = function (
  * @param {*} width cell width 二维码宽度1-10
  * @param {*} rotation 旋转角度（顺时针方向） 0，90，180，270
  * @param {*} content 内容
- * @returns
+ * @returns {}
  */
 exports.addQRCode = function (x, y, level, width, rotation, content) {
   exec(null, null, "WisGprinter", "addQRCode", [
@@ -206,9 +222,17 @@ exports.addQRCode = function (x, y, level, width, rotation, content) {
  * @param {*} x_
  * @param {*} y_
  * @param {*} str 内容
- * @returns
+ * @returns {}
  */
-exports.addText = function (x, y, str, font = "SIMPLIFIED_CHINESE", rotation = 0, x_ = 1, y_ = 1) {
+exports.addText = function (
+  x,
+  y,
+  str,
+  font = "SIMPLIFIED_CHINESE",
+  rotation = 0,
+  x_ = 1,
+  y_ = 1
+) {
   exec(null, null, "WisGprinter", "addText", [
     x,
     y,
@@ -226,7 +250,7 @@ exports.addText = function (x, y, str, font = "SIMPLIFIED_CHINESE", rotation = 0
  * 下一张时打印机会将原先多推出或少推出的部分以回拉方式补偿回来。该指令仅
  * 适用于剥离模式。
  * @param {*} offset 纸张停止的距离 单位mm
- * @returns
+ * @returns {}
  */
 exports.addOffset = function (offset) {
   exec(null, null, "WisGprinter", "addOffset", [offset])
@@ -235,7 +259,7 @@ exports.addOffset = function (offset) {
 /**
  * 该指令用于控制打印速度
  * @param {*} printSpeed 1<=printSpeed<=4 实际支持速度以自检页为准
- * @returns
+ * @returns {}
  */
 exports.addSpeed = function (printSpeed) {
   exec(null, null, "WisGprinter", "addSpeed", [printSpeed])
@@ -244,7 +268,7 @@ exports.addSpeed = function (printSpeed) {
 /**
  * 该指令用于控制打印时的浓度
  * @param {*} printDensity 0<=printDensity<=15
- * @returns
+ * @returns {}
  */
 exports.addDensity = function (printDensity) {
   exec(null, null, "WisGprinter", "addDensity", [printDensity])
@@ -254,7 +278,7 @@ exports.addDensity = function (printDensity) {
  * 该指令用于定义打印时出纸和打印字体的方向
  * @param {*} direction 0(横向)和1(纵向)
  * @param {*} mirror 0(正常)和1(镜像)
- * @returns
+ * @returns {}
  */
 exports.addDirection = function (direction, mirror) {
   exec(null, null, "WisGprinter", "addDirection", [direction, mirror])
@@ -266,7 +290,7 @@ exports.addDirection = function (direction, mirror) {
  * 打印机分辨率300 DPI:  1 mm = 12 dots
  * @param {*} x 水平方向的坐标位置,单位dots
  * @param {*} y 垂直方向的坐标位置,单位dots
- * @returns
+ * @returns {}
  */
 exports.addReference = function (x, y) {
   exec(null, null, "WisGprinter", "addReference", [x, y])
@@ -277,7 +301,7 @@ exports.addReference = function (x, y) {
  * 打印机分辨率200 DPI:  1 mm = 8  dots
  * 打印机分辨率300 DPI:  1 mm = 12 dots
  * @param {*} n 偏移量 ，单位dot 1mm=8 dots
- * @returns
+ * @returns {}
  */
 exports.addShift = function (n) {
   exec(null, null, "WisGprinter", "addShift", [n])
@@ -299,7 +323,7 @@ exports.addShift = function (n) {
  * 1253:Greek
  * 1254:Turkish
  * @param {*} codepage
- * @returns
+ * @returns {}
  */
 exports.addCodepage = function (codepage) {
   exec(null, null, "WisGprinter", "addCodepage", [codepage])
@@ -307,7 +331,7 @@ exports.addCodepage = function (codepage) {
 }
 /**
  * 该指令用于清除图像缓冲区（image buffer)的数据
- * @returns
+ * @returns {}
  */
 exports.addCls = function () {
   exec(null, null, "WisGprinter", "addCls", [])
@@ -318,7 +342,7 @@ exports.addCls = function () {
  * 打印机分辨率200 DPI:1 mm = 8  dots
  * 打印机分辨率300 DPI:1 mm = 12 dots
  * @param {*} feed 点数dots
- * @returns
+ * @returns {}
  */
 exports.addFeed = function (feed) {
   exec(null, null, "WisGprinter", "addFeed", [feed])
@@ -327,7 +351,7 @@ exports.addFeed = function (feed) {
 /**
  * 该指令用于将标签纸向后回拉指定的长度
  * @param {*} backup 点数dots
- * @returns
+ * @returns {}
  */
 exports.addBackFeed = function (backup) {
   exec(null, null, "WisGprinter", "addBackFeed", [backup])
@@ -335,7 +359,7 @@ exports.addBackFeed = function (backup) {
 }
 /**
  * 该指令用于控制打印机进一张标签纸
- * @returns
+ * @returns {}
  */
 exports.addFromfeed = function () {
   exec(null, null, "WisGprinter", "addFromfeed", [])
@@ -346,7 +370,7 @@ exports.addFromfeed = function () {
  * 置时，此指令可将标签纸向前推送至下一张标签纸的起点开始打印。标签尺寸和
  * 间隙需要在本条指令前设置
  * 注：使用该指令时，纸张高度大于或等于30 mm
- * @returns
+ * @returns {}
  */
 exports.addHome = function () {
   exec(null, null, "WisGprinter", "addHome", [])
@@ -354,7 +378,7 @@ exports.addHome = function () {
 }
 /**
  * 该指令用于打印出存储于影像缓冲区内的数据
- * @returns
+ * @returns {} {}
  */
 exports.addPagePrint = function () {
   exec(null, null, "WisGprinter", "addPagePrint", [])
@@ -364,7 +388,7 @@ exports.addPagePrint = function () {
  * 该指令用于打印出存储于影像缓冲区内的数据
  * @param {*} page 打印份数
  * @param {*} n
- * @returns
+ * @returns {}
  */
 exports.addPrint = function (page, n = 1) {
   exec(null, null, "WisGprinter", "addPrint", [page, n])
@@ -374,7 +398,7 @@ exports.addPrint = function (page, n = 1) {
  * 该指令用于控制蜂鸣器的频率，可设定10 阶的声音，每阶声音的长短由第二个参数控制
  * @param {*} level 音阶:0-9
  * @param {*} interval 间隔时间:1-4095
- * @returns
+ * @returns {}
  */
 exports.addSound = function (level, interval) {
   exec(null, null, "WisGprinter", "addSound", [level, interval])
@@ -383,7 +407,7 @@ exports.addSound = function (level, interval) {
 /**
  * 该指令用于设定打印机进纸时，若经过所设定的长度仍无法侦测到垂直间距，则打印机在连续纸模式工作
  * @param {*} limit 检测垂直间距 点数dots
- * @returns
+ * @returns {}
  */
 exports.addLimitfeed = function (limit) {
   exec(null, null, "WisGprinter", "addLimitfeed", [limit])
@@ -391,7 +415,7 @@ exports.addLimitfeed = function (limit) {
 }
 /**
  * 打印自检页
- * @returns
+ * @returns {}
  */
 exports.addSelfTest = function () {
   exec(null, null, "WisGprinter", "addSelfTest", [])
@@ -403,7 +427,7 @@ exports.addSelfTest = function () {
  * @param {*} y_start 反相区域左上角Y 坐标，单位dot
  * @param {*} x_width 反相区域宽度，单位dot
  * @param {*} y_height 反相区域高度，单位dot
- * @returns
+ * @returns {}
  */
 exports.addErase = function (x_start, y_start, x_width, y_height) {
   exec(null, null, "WisGprinter", "addErase", [
@@ -420,7 +444,7 @@ exports.addErase = function (x_start, y_start, x_width, y_height) {
  * @param {*} y_start 反相区域左上角Y 坐标，单位dot
  * @param {*} x_width 反相区域宽度，单位dot
  * @param {*} y_height 反相区域高度，单位dot
- * @returns
+ * @returns {}
  */
 exports.addReverse = function (x_start, y_start, x_width, y_height) {
   exec(null, null, "WisGprinter", "addReverse", [
@@ -434,7 +458,7 @@ exports.addReverse = function (x_start, y_start, x_width, y_height) {
 /**
  * 该指令用来启动/关闭剥离模式，默认值为关闭
  * @param {*} n 1 起动剥离模式 0 关闭剥离模式
- * @returns
+ * @returns {}
  */
 exports.addPeel = function (n) {
   exec(null, null, "WisGprinter", "addPeel", [n])
@@ -443,7 +467,7 @@ exports.addPeel = function (n) {
 /**
  * 此命令是用来启用/禁用撕纸位置走到撕纸处，此设置关掉电源后将保存在打印机内
  * @param {*} n 1 启用撕纸位置走到撕纸处 0 禁用撕纸位置走到撕纸处，命令在起始位置有效
- * @returns
+ * @returns {}
  */
 exports.addTear = function (n) {
   exec(null, null, "WisGprinter", "addTear", [n])
@@ -452,7 +476,7 @@ exports.addTear = function (n) {
 /**
  * 此命令将禁用/启用标签机在无纸或开盖错误发生后，上纸或合盖后重新打印一次标签内容
  * @param {*} n 1 启用此功能 0 禁止此功能
- * @returns
+ * @returns {}
  */
 exports.addReprint = function (n) {
   exec(null, null, "WisGprinter", "addReprint", [n])
@@ -461,7 +485,7 @@ exports.addReprint = function (n) {
 /**
  * 此命令用于设置切刀状态，关闭打印机电源后，该设置将会被存储在打印机内存中
  * @param {*} n  1 启用此功能 0 禁止此功能
- * @returns
+ * @returns {}
  */
 exports.addCut = function (n) {
   exec(null, null, "WisGprinter", "addCut", [n])
@@ -470,7 +494,7 @@ exports.addCut = function (n) {
 /**
  * 在PRINT 命令结束后切纸
  * @param {*} pieces pieces 0-65535，用于设置每几个标签进行切纸
- * @returns
+ * @returns {}
  */
 exports.addCutterPieces = function (pieces) {
   exec(null, null, "WisGprinter", "addCutterPieces", [pieces])
@@ -479,7 +503,7 @@ exports.addCutterPieces = function (pieces) {
 /**
  * 开启带Response的打印，用于连续打印
  * @param {*} n ON, OFF, BATCH
- * @returns
+ * @returns {}
  */
 exports.addCut = function (n) {
   exec(null, null, "WisGprinter", "addCut", [n])
